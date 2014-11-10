@@ -36,6 +36,8 @@ import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.dynamodbv2.model.PutItemResult;
+import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryResult;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
@@ -68,9 +70,12 @@ public class QueryDynamoDB {
 		 */
 		AWSCredentials credentials = null;
 		try {
-                  credentials = new ProfileCredentialsProvider("default") .getCredentials();
+			credentials = new ProfileCredentialsProvider("default")
+					.getCredentials();
 		} catch (Exception e) {
-                  throw new AmazonClientException("Cannot load the credentials from the credential profiles file." + e);
+			throw new AmazonClientException(
+					"Cannot load the credentials from the credential profiles file."
+							+ e);
 		}
 		dynamoDB = new AmazonDynamoDBClient(credentials);
 		Region usWest1 = Region.getRegion(Regions.US_WEST_1);
@@ -87,21 +92,38 @@ public class QueryDynamoDB {
 			if (Tables.doesTableExist(dynamoDB, tableName)) {
 				System.out.println("Table " + tableName + " is already ACTIVE");
 			} else {
-				System.out.println("Table to query " + tableName + "does not exist");
+				System.out.println("Table to query " + tableName
+						+ "does not exist");
 			}
 
 			while (true) {
 				// Scan items for movies with a year attribute greater than 1985
 				HashMap<String, Condition> scanFilter = new HashMap<String, Condition>();
-				Condition condition = new Condition().withComparisonOperator(
-						ComparisonOperator.GT.toString())
+				Condition scanCondition = new Condition()
+						.withComparisonOperator(
+								ComparisonOperator.GT.toString())
 						.withAttributeValueList(
 								new AttributeValue().withN("1985"));
-				scanFilter.put("year", condition);
+				scanFilter.put("year", scanCondition);
 				ScanRequest scanRequest = new ScanRequest(tableName)
 						.withScanFilter(scanFilter);
 				ScanResult scanResult = dynamoDB.scan(scanRequest);
 				System.out.println("Result: " + scanResult);
+
+				Condition hashKeyCondition = new Condition()
+						.withComparisonOperator(ComparisonOperator.EQ)
+						.withAttributeValueList(
+								new AttributeValue().withS("Matrix"));
+
+				Map<String, Condition> keyConditions = new HashMap<String, Condition>();
+				keyConditions.put("name", hashKeyCondition);
+
+				QueryRequest queryRequest = new QueryRequest().withTableName(
+						tableName).withKeyConditions(keyConditions);
+
+				QueryResult queryResult = dynamoDB.query(queryRequest);
+				System.out.println("Result: " + queryResult);
+
 				Thread.sleep(5000);
 			}
 
