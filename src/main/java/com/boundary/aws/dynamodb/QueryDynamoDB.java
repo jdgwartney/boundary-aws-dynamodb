@@ -68,14 +68,9 @@ public class QueryDynamoDB {
 		 */
 		AWSCredentials credentials = null;
 		try {
-			credentials = new ProfileCredentialsProvider("default")
-					.getCredentials();
+                  credentials = new ProfileCredentialsProvider("default") .getCredentials();
 		} catch (Exception e) {
-			throw new AmazonClientException(
-					"Cannot load the credentials from the credential profiles file. "
-							+ "Please make sure that your credentials file is at the correct "
-							+ "location (/Users/davidg/.aws/credentials), and is in valid format.",
-					e);
+                  throw new AmazonClientException("Cannot load the credentials from the credential profiles file." + e);
 		}
 		dynamoDB = new AmazonDynamoDBClient(credentials);
 		Region usWest1 = Region.getRegion(Regions.US_WEST_1);
@@ -92,8 +87,7 @@ public class QueryDynamoDB {
 			if (Tables.doesTableExist(dynamoDB, tableName)) {
 				System.out.println("Table " + tableName + " is already ACTIVE");
 			} else {
-				System.out.println("Table to query " + tableName
-						+ "does not exist");
+				System.out.println("Table to query " + tableName + "does not exist");
 			}
 
 			while (true) {
