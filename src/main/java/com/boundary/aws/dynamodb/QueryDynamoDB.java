@@ -128,16 +128,4 @@ public class QueryDynamoDB {
 			System.out.println("Error Message: " + ace.getMessage());
 		}
 	}
-
-	private static Map<String, AttributeValue> newItem(String name, int year,
-			String rating, String... fans) {
-		Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
-		item.put("name", new AttributeValue(name));
-		item.put("year", new AttributeValue().withN(Integer.toString(year)));
-		item.put("rating", new AttributeValue(rating));
-		item.put("fans", new AttributeValue().withSS(fans));
-
-		return item;
-	}
-
 }
